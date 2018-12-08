@@ -1,0 +1,9 @@
+
+For Depends: line in control file:
+libatk1.0-0, libc6, libcairo2, libfontconfig1, libfreetype6, libgdk-pixbuf2.0-0, libglib2.0-0, libgtk2.0-0, libmenu-cache3, libpango-1.0-0, libpangocairo-1.0-0, libpangoft2-1.0-0, 
+
+For installing with apt-get (all dependencies):
+libatk1.0-0 libc6 libcairo2 libfontconfig1 libfreetype6 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk2.0-0 libmenu-cache3 libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0
+
+Optional (for converting SVG to PNG):
+librsvg2-bin

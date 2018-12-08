@@ -1,0 +1,67 @@
+#!/bin/bash
+
+export user_home=$(eval echo ~${SUDO_USER})
+mkdir -p $user_home/.config/xlunch 2> /dev/null
+
+xl_menu_update () {
+#export XDG_CONFIG_DIRS="$user_home/.config:/etc/xdg"
+#rm -f $user_home/.cache/menus/*
+#pkill menu-cached
+rm -f $user_home/.config/xlunch/entries.dsv
+export svgpath=$user_home/.local/share/xlunch/svgicons
+mkdir -p $svgpath
+while read LINE; do
+ICON=$(echo "$LINE" | awk -F';' '{print $2}')
+if [ "${ICON##*.}" = "svg" -o "$ICON" = "(null)" ] || [[ "$ICON" == *"empty"* ]]; then
+iconname=$(basename "${ICON%.*}")
+  if [ "$(which rsvg-convert)" != "" ]; then
+          if [ ! -f "${svgpath}/${iconname}.png" ];then
+            rsvg-convert "$ICON" \
+              --keep-aspect-ratio \
+              --output "$svgpath/"$iconname".png" 2>/dev/null
+          fi
+echo "$(echo $LINE | awk -F';' '{print $1}');$svgpath/$iconname.png;$(echo $LINE | awk -F';' '{print $3}')" >> $user_home/.config/xlunch/entries.dsv
+  else
+     if [ -f "${svgpath}/${iconname}.png" ]; then
+echo "$(echo $LINE | awk -F';' '{print $1}');$svgpath/$iconname.png;$(echo $LINE | awk -F';' '{print $3}')" >> $user_home/.config/xlunch/entries.dsv
+    else
+echo $LINE >> $user_home/.config/xlunch/entries.dsv
+    fi
+  fi
+continue
+else
+echo $LINE >> $user_home/.config/xlunch/entries.dsv
+fi
+done <<< "$(cat $user_home/.config/xlunch/entries.tmp)"
+
+}
+export -f xl_menu_update
+
+if [ ! -f "$user_home/.config/xlunch/xlunch-applications.menu" ]; then
+echo '<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+  "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+    <Name>Applications</Name>
+
+    <DefaultAppDirs/>
+    <DefaultDirectoryDirs/>
+    <DefaultMergeDirs/>
+    <Menu>
+        <Name>Other</Name>
+        <Directory>xlunch.directory</Directory>
+        <OnlyUnallocated/>
+        <Include>
+            <All/>
+        </Include>
+    </Menu>
+
+</Menu>
+' > $user_home/.config/xlunch/xlunch-applications.menu
+fi
+#export XDG_CONFIG_DIRS="$user_home/.config:/etc/xdg"
+xlunch-menu $user_home/.config/xlunch/xlunch-applications.menu -I 128 -o $user_home/.config/xlunch/entries.tmp 2> /dev/null
+xl_menu_update
+echo "Xlunch entries file generated: $user_home/.config/xlunch/entries.dsv"
+sleep 4
+

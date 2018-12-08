@@ -1,0 +1,33 @@
+# Contributors: Calimero <calimeroteknik@free.fr>
+# Maintainer: mimas <mimasgpc@free.fr>
+
+_pkgname=xlunch-menu
+pkgname=$_pkgname-hg
+pkgver=66.35d948d8b998
+pkgrel=1
+pkgdesc="Menu generator for xlunch"
+arch=('i686' 'x86_64')
+provides=("xlunch-menu")
+conflicts=("xlunch-menu")
+url="http://mimasgpc.free.fr/openbox-menu.html"
+license=('GPL3')
+depends=('gtk2' 'menu-cache')
+makedepends=("mercurial")
+optdepends=('librsvg')
+source=("hg+https://bitbucket.org/fabriceT/openbox-menu")
+md5sums=('SKIP')
+
+pkgver() {
+  cd $_pkgname
+  echo $(hg identify -n).$(hg identify -i)
+}
+
+build() {
+  cd $_pkgname
+  make
+}
+
+package() {
+  cd $_pkgname
+  make install DESTDIR="${pkgdir}/usr/"
+}

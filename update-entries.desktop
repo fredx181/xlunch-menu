@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Update entries for xlunch (convert .svg to .png)
+Exec=xlunch-menu-update
+Icon=xlunch-logo
+Type=Application
+Terminal=true
+Categories=System;
