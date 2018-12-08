@@ -12,9 +12,12 @@ https://bitbucket.org/geekless/openbox-menu/
 
 Type `make` then, with superuser privileges, `make install` to install it.  
 xlunch-menu is installed in /usr/local/bin directory by default, type    
-`make install DESTDIR=/usr` to install it to /usr/bin/directory.  
+`make install DESTDIR=/usr` to install it to /usr/bin/directory.
 
-### Dependencies:  
+To test (will create ./entries.dsv:     
+`make check`   
+
+### Dependencies:    
 For compiling:  
 menu-cache , gtk2 (for Debian: libmenu-cache-dev, libgtk2.0-dev)    
 
