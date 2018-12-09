@@ -60,7 +60,7 @@ echo '<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
 ' > $user_home/.config/xlunch/xlunch-applications.menu
 fi
 #export XDG_CONFIG_DIRS="$user_home/.config:/etc/xdg"
-xlunch-menu $user_home/.config/xlunch/xlunch-applications.menu -I 128 -o $user_home/.config/xlunch/entries.tmp 2> /dev/null
+xlunch-menu $user_home/.config/xlunch/xlunch-applications.menu -I 128 -o $user_home/.config/xlunch/entries.tmp
 xl_menu_update
 echo "Xlunch entries file generated: $user_home/.config/xlunch/entries.dsv"
 sleep 4

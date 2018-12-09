@@ -283,51 +283,38 @@ generate_openbox_menu (MenuCacheDir *dir, OB_Menu *context)
 void
 display_menu (MenuCache *menu, OB_Menu *context)
 {
-    context->builder = g_string_sized_new (16 * 1024);
-
-    adapter->root_node_open(context);
-
 	MenuCacheDir *dir = menu_cache_get_root_dir (menu);
-	if (dir == NULL)
+	if (G_UNLIKELY(dir == NULL))
 	{
-        adapter->error(context, "Cannot get menu root dir");
-		g_warning ("Cannot get menu root dir");
+		g_warning ("Can't get menu root dir");
+		return;
 	}
 
-    GSList *l = NULL;
-    if (dir != NULL)
-    	l = menu_cache_dir_get_children(dir);
+	GSList *l = menu_cache_dir_get_children (dir);
 
-	if (g_slist_length (l) != 0)
-    {
+	if (g_slist_length (l) != 0) {
+		context->builder = g_string_sized_new (16 * 1024);
+
 		generate_openbox_menu(dir, context);
-	}
-	else
-    {
-        adapter->error(context, "Cannot create menu, check if the .menu file is correct");
-		g_warning ("Cannot create menu, check if the .menu file is correct");
-    }
 
-    adapter->root_node_close(context);
 
-	gchar *buff = g_string_free (context->builder, FALSE);
+		gchar *buff = g_string_free (context->builder, FALSE);
 
-	/* Has menu content to be saved in a file ? */
-	if (context->output)
-	{
-		if (!g_file_set_contents (context->output, buff, -1, NULL))
-			g_warning ("Can't write to %s\n", context->output);
-		else
+		/* Has menu content to be saved in a file ? */
+		if (context->output)
+		{
+			if (!g_file_set_contents (context->output, buff, -1, NULL))
+				g_warning ("Can't write to %s\n", context->output);
+			else
 {
-			g_message ("wrote to %s", context->output);
-
+				g_message ("wrote to %s", context->output);
 char buf[4096];
 sprintf(buf, "sort -fu %s > /tmp/_xl_entries_tmp_ && mv /tmp/_xl_entries_tmp_ %s", context->output, context->output);
 system(buf);
 }
-	}
-	else /* No, so it's displayed on screen */
-		g_print ("%s", buff);
+		}
+		else /* No, so it's displayed on screen */
+			g_print ("%s", buff);
 
     if (context->persistent && context->run_on_update && strlen(context->run_on_update))
     {
@@ -335,23 +322,9 @@ system(buf);
     }
 
 	g_free (buff);
-
-}
-
-static guint reload_timeout_id = 0;
-
-static gboolean on_reload_timeout(OB_Menu *context)
-{
-    display_menu(context->menu, context);
-    reload_timeout_id = 0;
-    return FALSE;
-}
-
-void on_reload_notify(MenuCache *menu, OB_Menu *context)
-{
-    context->menu = menu;
-    if (reload_timeout_id == 0)
-        reload_timeout_id = g_timeout_add(1500, on_reload_timeout, context);
+	}
+	else
+		g_warning ("Cannot create menu, check if the .menu file is correct");
 }
 
 gchar *
@@ -423,7 +396,6 @@ main (int argc, char **argv)
 	gchar   **app_menu = NULL;
 	gchar    *output = NULL;
 	gchar    *terminal = "xterm -e";
-	gchar    *format = "openbox";
     gchar    *run_on_update = NULL;
 
 	/*
@@ -531,16 +503,15 @@ main (int argc, char **argv)
 	display_menu(menu_cache, &ob_context);
 
     ob_context.persistent = persistent;
-    if (persistent)
-        ob_context.run_on_update = run_on_update;
-
 
 	if (persistent)
 	{
+    ob_context.run_on_update = run_on_update;
+
 		// menucache used to reload the cache after a call to menu_cache_lookup* ()
 		// It's not true anymore with version >= 0.4.0.
 		reload_notify_id = menu_cache_add_reload_notify (menu_cache,
-		                        (MenuCacheReloadNotify) on_reload_notify,
+		                        (MenuCacheReloadNotify) display_menu,
 		                        &ob_context);
 
 		// install signals handler

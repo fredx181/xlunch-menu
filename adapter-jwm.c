@@ -2,37 +2,17 @@
 
 static void jwm_root_node_open(OB_Menu * context)
 {
-    g_string_append(context->builder, "");
+
 }
 
 static void jwm_root_node_close(OB_Menu * context)
 {
-    g_string_append(context->builder, "");
+
 }
 
 static void jwm_directory_node_open(OB_Menu * context, MenuCacheApp * dir)
 {
-	gchar *dir_name = get_safe_name (menu_cache_item_get_name (MENU_CACHE_ITEM(dir)));
 
-#ifdef WITH_ICONS
-	if (!context->no_icons)
-	{
-		gchar *dir_icon = get_item_icon_path (MENU_CACHE_ITEM(dir));
-
-		g_string_append_printf (context->builder,
-		    "",
-		    dir_name, dir_icon);
-		g_free (dir_icon);
-	}
-	else
-#endif
-	{
-		g_string_append_printf (context->builder,
-	      "",
-	      dir_name);
-	}
-
-	g_free (dir_name);
 }
 
 static void jwm_directory_node_close(OB_Menu * context, MenuCacheApp * app)
